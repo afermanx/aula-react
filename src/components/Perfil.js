@@ -7,18 +7,34 @@ export default class Perfil extends Component {
     state = {
         nome: '',
         foto: '',
-        user: ''
+        user: '',
+        followers:0,
+        following:0,
+        Repos:"",
+        nameRepo:""
+       
+
     }
 
     loadNome = async (usuario) => {
         const response = await api.get('/'+usuario)
         const user = response.data
 
+        const responseRepo = await api.get('/'+usuario+'/repos')
+        const repo = responseRepo.data
+
         this.setState({
             nome: user.name,
-            foto: user.avatar_url
+            foto: user.avatar_url,
+            followers:user.followers,
+            following:user.following,
+            qtdRepo:user.public_repos,
+            nameRepo:repo[0].name
         })
     }
+    // /users/afermanx/repos
+    
+    
 
     handleUser = (text) => {
         this.setState({ user: text })
@@ -26,6 +42,7 @@ export default class Perfil extends Component {
 
     handleButton = () => {
         this.loadNome(this.state.user)
+        
     }
 
     render() {
@@ -35,12 +52,20 @@ export default class Perfil extends Component {
 
         return (
             <View style={ styles.container }>
+                <Image style={ styles.foto } source={ pic } />
+
                 <TextInput style={ styles.textInput } onChangeText={ this.handleUser } ></TextInput>
                 <TouchableOpacity style={ styles.button } onPress={ this.handleButton } >
                     <Text style={ styles.buttonText }>Enviar</Text>
                 </TouchableOpacity>
-                <Text style={ styles.nome }>{ this.state.nome }</Text>
-                <Image style={ styles.foto } source={ pic } />
+                <Text style={ styles.nome }>{ `Nome:${this.state.nome}` }</Text>
+                <Text style={ styles.follow }>
+                <Text >{ `Seguidores:${this.state.followers} ` }</Text>
+                <Text >{ `Seguindo:${this.state.following}` }</Text>
+                
+                </Text>
+                <Text style={ styles.follow }>{ `Repositórios:${this.state.qtdRepo}` }</Text>
+                <Text style={ styles.follow }>{ `Repositórios:${this.state.nameRepo}` }</Text>
             </View>
         )
     }
@@ -53,6 +78,13 @@ const styles = StyleSheet.create({
       color: '#f55',
       fontWeight: 'bold'
     },
+
+    follow: {
+        fontFamily: 'Roboto',
+        fontSize: '0.8em',
+        color: '#f55',
+        fontWeight: 'bold'
+      },
     foto: {
         width: 200,
         height: 200,
